@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pinterest Jocarosa</title>
+    
+    <!--JQUERY-->
+    <script   src="https://code.jquery.com/jquery-2.2.4.js"   integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI="   crossorigin="anonymous"></script>
+    <!--BOOSTRAP JS-->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <!--ANGULAR JS-->
+    <script src="https://code.angularjs.org/1.4.9/angular.min.js"></script>
+    <!--BOOSTRAP CSS-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    
+    
+    <!--NGROUTE-->
+    <script src="angular-route/angular-route.js"></script>
+    <!--MODAL SERVICE-->
+    <script src="https://rawgit.com/dwmkerr/angular-modal-service/master/dst/angular-modal-service.js"></script>  
+    <!--MASONRYS.JS-->
+    <script src="masonry/dist/masonry.pkgd.js"></script>
+    
+    <!--my link files-->
+    <link rel="stylesheet" href="css/style.css">
+    <script src="./js/initmasonry.js"></script>
+</head>
+
+
+
+
+
+
+<body>
+
+<div ng-app='pinterest' id='mainContainer'  ng-controller='mainController' ng-init='showLiUser=true'>
+    <header>
+        <ul class="nav nav-pills">
+          <li role="presentation" class="active"><a href="#">Home</a></li>
+          <li ng-show='showLiUser' role='presentation'><a href='/auth/twitter'>Login</a></li>
+          <li ng-hide='showLiUser' role="presentation" class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+              Welcome! {{user}} <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                 <li><a href="/logout">LogOut</a></li>
+                 
+            </ul>
+          </li>
+        </ul>
+    </header>
+    
+    
+    
+   
+        <!-- Trigger/Open The Modal -->
+        <button class='styleLinkNew'  ng-show='!showLiUser' ng-click='openModal()'>New Link</button>
+        <div id='containerEnlaces'>
+            <a href='#allWalls' ng-click="showAllMy('all')">Recent Walls </a>
+            <a href='#myWalls' ng-click="showAllMy('my')" ng-show='!showLiUser' >│ My Walls</a>
+            <div id='divView' ng-view></div>
+        </div>
+  
+    
+    <footer>Pinterest by Jocarosa</footer>  
+</div>
+</body>
+
+
+
+<script>
+    
+var app = angular.module('pinterest',['ngRoute','angularModalService']);
+    
+    app.config(['$routeProvider',function($routeProvider){
+        
+        $routeProvider.
+             when('/', {
+                templateUrl: 'viewTemplate/myWalls.html', controller: 'mainController'
+            }).
+            when('/allWalls', {
+                templateUrl: 'viewTemplate/allWalls.html', controller: 'mainController'
+            }).
+            when('/myWalls', {
+                templateUrl: 'viewTemplate/myWalls.html', controller: 'mainController'
+            }); 
+    }]);
+  
+    
+    app.directive('fallbackSrc', function () {
+        var fallbackSrc = {
+            link: function postLink(scope, iElement, iAttrs) {
+                iElement.bind('error', function() {
+                    angular.element(this).attr("src", iAttrs.fallbackSrc);
+                });
+            }
+        };
+        return fallbackSrc;
+    });
+    
+    app.controller('mainController', function($scope,$http,ModalService) {
+       
+      
+        
+       $http.get('/session').then(function(response){
+           if(response){
+               $scope.showLiUser = false;
+               $scope.user       = response.data.displayName;
+             
+           }
+       });
+       
+       $scope.openModal = function () {
+           ModalService.showModal({
+                templateUrl: "modals/modalLink.html",
+                controller: "ModalController"
+            }).then(function(modal) {
+
+                modal.element.modal();
+                modal.close.then(function(link) {
+                    
+                    if(link!='Cancel'){
+                        
+                        //Inserting new link
+                        $http.post('/insertLink',{inLink:link}).then(function(response){
+                             alert(response.data);
+                        });
+                       
+                    }
+                
+                });
+            }); 
+        };
+        
+        $scope.showAllMy= function(allMy){
+            
+            $http.post('/getLinks',{dame:allMy}).then(function(response){
+                
+                
+                if(allMy=="my"){
+                    $scope.myLinks = response.data;
+                }else{
+                    $scope.allLinks = response.data;
+                }
+                
+                
+                
+            });
+           
+        };
+        
+        $scope.deleteLink = function(linkToDelete){
+            
+            if(confirm("Are you sure?")){
+                $http.post('/deleteLink',{linkToDelete:linkToDelete}).then(function(response){})   
+            }
+        }
+       
+       
+        
+    
+    });
+   
+       
+    app.controller('ModalController', function($scope, close,$http) {
+
+        
+       $scope.close= function(link){
+           
+           close(link,500);
+       };
+       
+       $scope.validateLink= function(txtLink){
+          
+            $http.post('/validateLink',{link:txtLink}).then(function(response){
+                
+              if(response.data[0].msg =='no existe'){
+                  $scope.allowInsert = false;
+                  $scope.linkSecured=response.data[0].img; //img no available
+                   
+                  
+              }
+              else{
+                  $scope.allowInsert = true;
+                  $scope.linkSecured=response.data[0].img;
+                }  
+                
+                
+               
+            });
+          
+          
+       };
+       
+      
+       
+        
+      
+       
+        
+    });
+    
+
+
+</script> 
+
+
+</html>

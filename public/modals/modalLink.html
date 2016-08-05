@@ -1,0 +1,32 @@
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            
+            
+            
+            <div id='containerNewLink'>
+               <a href='/'  class="close"  ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</a>
+               <table>
+                  <tr>
+                      <td colspan='2'>
+                          <img class='styleImgLink' ng-src="{{linkSecured}}">
+                      </td>
+                      
+                  </tr>
+                  <tr>
+                      <td>
+                         Link:
+                      </td>
+                      <td>
+                          <input ng-keyup='validateLink(txtLink)' type=text ng-model='txtLink'>
+                          <a ng-show='allowInsert' href='/#' data-dismiss="modal"  ng-click="close(txtLink)">Insert</a>
+                      </td>
+                     
+                  </tr>
+                 
+               </table>
+                   
+            </div>
+        </div>
+    </div>
+</div>
