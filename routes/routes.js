@@ -101,7 +101,7 @@ module.exports= function(app,passport){
     		 if(links.length>0){
     		    validateL(links,res);
     		 }else{
-    		     res.send({msg:"no existe",link:"Please insert a link"})
+    		     res.send([{msg:"no existe",link:"Please insert a link"}])
     		 }
     	});
     });
