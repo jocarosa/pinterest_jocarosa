@@ -135,14 +135,16 @@ var app = angular.module('pinterest',['ngRoute','angularModalService']);
             
             $http.post('/getLinks',{dame:allMy}).then(function(response){
                 
-                
-                if(allMy=="my"){
-                    $scope.myLinks = response.data;
+                if(response.data[0].msg=="no existe"){
+                    $scope.showImg=false;
                 }else{
-                    $scope.allLinks = response.data;
+                    if(allMy=="my"){
+                        $scope.myLinks = response.data;
+                    }else{
+                        $scope.allLinks = response.data;
+                    }
+                    $scope.showImg=true;
                 }
-                
-                
                 
             });
            
