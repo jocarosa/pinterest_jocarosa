@@ -4,16 +4,13 @@ var request			 = require('request');
 
 module.exports= function(app,passport){
     
-    app.route('/auth/twitter')
-		.get(passport.authenticate('twitter'));
+    app.get('/auth/twitter',passport.authenticate('twitter'));
 	
-	app.route('/twitter/callback')
-		.get(passport.authenticate('twitter', {
+	app.get('/twitter/callback',passport.authenticate('twitter', {
 			successRedirect: '/#'
 		}));
 	
-	app.route('/logout')
-		.get(function (req, res) {
+	app.get('/logout',function (req, res) {
 			req.logout();
 			res.redirect('/#');
 		});
@@ -74,7 +71,7 @@ module.exports= function(app,passport){
         	
         	if(result.length == 0){
         		
-        			var options={link:linkToInsert, idUser:req.user.twitter.id}
+        			var options={link:linkToInsert, idUser:req.user.twitter.id};
         			
         			var newLink = new Link(options);
         		
@@ -97,14 +94,14 @@ module.exports= function(app,passport){
     	
     	if(dame=="my"){
     		
-    		options   = {idUser:req.user.twitter.id}
+    		options   = {idUser:req.user.twitter.id};
     	}
     	
     	Link.find(options,function(err,links){
     		 
     		 validateL(links,res);
     		 
-    		})
+    		});
     });
     
     app.post('/deleteLink',function(req,res){
