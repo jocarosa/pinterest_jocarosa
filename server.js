@@ -4,7 +4,7 @@ var passport   = require('passport');
 var session    = require('express-session');
 var routes     = require('./routes/routes.js');
 var mongoose   = require('mongoose');
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
 app.use(express.static(__dirname + '/bower_components'));
 app.use(express.static(__dirname + '/node_modules'));
 app.use(express.static(__dirname + '/public'));
