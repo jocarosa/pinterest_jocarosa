@@ -98,10 +98,10 @@ module.exports= function(app,passport){
     	}
     	
     	Link.find(options,function(err,links){
-    		 
-    		 validateL(links,res);
-    		 
-    		});
+    		 if(links.length>0){
+    		    validateL(links,res);
+    		 }
+    	});
     });
     
     app.post('/deleteLink',function(req,res){
@@ -110,6 +110,6 @@ module.exports= function(app,passport){
     	
     	Link.remove({link:linkD},function(err,doc){console.log('doc removed')})
     	
-    })
+    });
     
 };
