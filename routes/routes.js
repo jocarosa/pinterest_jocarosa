@@ -100,6 +100,8 @@ module.exports= function(app,passport){
     	Link.find(options,function(err,links){
     		 if(links.length>0){
     		    validateL(links,res);
+    		 }else{
+    		     res.send({msg:"no existe",link:"Please insert a link"})
     		 }
     	});
     });
